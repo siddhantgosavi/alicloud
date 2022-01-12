@@ -35,6 +35,7 @@ def handler():
     request = DescribeVulListRequest()
     request.set_accept_format('json')
     request.set_Type("cve")
+    request.set_PageSize(100)
 
     response = client.do_action_with_exception(request)
 
@@ -46,6 +47,8 @@ def handler():
                                 vul['AliasName'], vul['Related'], vul['Level'], 
                                 vul['Necessity'], vul['CanFix'], vul['Status'])
         vulList.append(vuldata)
+
+    vulList = sorted(vulList, key=lambda x: x.Level)
 
     print ("{:<22} {:<17} {:<12} {:<90} {:<10} {:<10} {:<10} {:<5}".format('InstanceId','InstanceName','OSName','VulnerabilityName', 'Level', 'Necessity', 'CanFix', 'Status'))
     print()
