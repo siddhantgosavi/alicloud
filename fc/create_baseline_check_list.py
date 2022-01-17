@@ -1,0 +1,7 @@
+DescribeCheckWarningSummary
+CheckWArningMAchines
+DescribeWarningMachines
+DescribeAssetDetailByUuid
+
+DescribeCheckWarningSummary - PASS ASSET UUID
+DescribeCheckWarning - PASS ASSET UUID
