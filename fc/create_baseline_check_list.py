@@ -23,7 +23,7 @@ def handler():
 
         client = AcsClient(region_id='us-west-1', credential=ramRoleArnCredentials)
 
-        print("\nFetching baseline catagories data..")
+        print("\nFetching baseline catagories data...", end='')
 
         request = DescribeCheckWarningSummaryRequest()
         request.set_accept_format('json')
@@ -36,12 +36,13 @@ def handler():
         response = client.do_action_with_exception(request)
 
         checkWarningSummaryData = json.loads(response)
+        print(" Catagories Count: " + str(checkWarningSummaryData['TotalCount']))
 
         instanceCheckWarnings = []
 
         for checkWarningSummary in checkWarningSummaryData['WarningSummarys']:
 
-            print("\nFetching data from Baseline: ", checkWarningSummary['RiskName'] + "\n")
+            print("\nFetching data from Baseline: " + checkWarningSummary['RiskName'] + "...", end='')
             request = DescribeWarningMachinesRequest()
             request.set_accept_format('json')
             request.set_Lang("en")
@@ -54,10 +55,11 @@ def handler():
 
             response = client.do_action_with_exception(request)
             warningMachineData = json.loads(response)
+            print(" MachineCount: " + str(warningMachineData['TotalCount']) + "\n")
 
             for warningMachine in warningMachineData['WarningMachines']:
 
-                print("\tFetching data for Instance: ", warningMachine['InstanceId'] + " : " + warningMachine['InstanceName'])
+                print("\tFetching data for Instance: " + warningMachine['InstanceId'] + " : " + warningMachine['InstanceName'] + "...", end='')
                 request = DescribeCheckWarningsRequest()
                 request.set_accept_format('json')
                 request.set_Lang("en")
@@ -71,6 +73,7 @@ def handler():
 
                 response = client.do_action_with_exception(request)
                 machineChecksData = json.loads(response)
+                print(" Baseline Check Count: " + str(machineChecksData['TotalCount']))
 
                 for machineWarning in machineChecksData['CheckWarnings']:
                     object = {
@@ -100,6 +103,7 @@ def handler():
                 dw.writerow(warning)
         
         print("\nBaseline list created in the file: ", filename)
+        print("Total baseline checks: " + str(len(instanceCheckWarnings)))
         
     except ClientException as e:
         print(e)
