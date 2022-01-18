@@ -1,3 +1,4 @@
 .terraform
 .DSStore
 .terraform.lock.*
+.csv
