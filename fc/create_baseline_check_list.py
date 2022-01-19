@@ -15,21 +15,20 @@ from aliyunsdksas.request.v20181203.DescribeWarningMachinesRequest import Descri
 from aliyunsdksas.request.v20181203.DescribeCheckWarningsRequest import DescribeCheckWarningsRequest
 
 if(len(sys.argv) == 1):
-    accountId = input("Enter Account ID: ")
+    RoleARN = input("Enter Role ARN: ")
 elif(len(sys.argv) == 2):
-    accountId = sys.argv[1]
+    RoleARN = sys.argv[1]
 
-print("Account ID: " + accountId)
+print("Role ARN: " + RoleARN)
 
-RamRoleARN = "acs:ram::" + accountId + ":role/customsecuritymanagerrole"
-RoleSession = "customsecuritymanagerrole-session"
+RoleSession = "secops-create-baseline-list-session"
 
 def handler():
     try:
         logger = logging.getLogger()
         print('Script for creating a list of all baseline checks...')
 
-        ramRoleArnCredentials = RamRoleArnCredential(os.environ['AccessKeyId'], os.environ['AccessKeySecret'], RamRoleARN, RoleSession)
+        ramRoleArnCredentials = RamRoleArnCredential(os.environ['AccessKeyId'], os.environ['AccessKeySecret'], RoleARN, RoleSession)
 
         client = AcsClient(region_id='us-west-1', credential=ramRoleArnCredentials)
 
