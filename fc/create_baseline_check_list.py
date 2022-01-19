@@ -17,7 +17,7 @@ from aliyunsdksas.request.v20181203.DescribeCheckWarningsRequest import Describe
 def handler():
     try:
         logger = logging.getLogger()
-        print('Script for creating a list of all vulnerabilities...')
+        print('Script for creating a list of all baseline checks...')
 
         ramRoleArnCredentials = RamRoleArnCredential(os.environ['AccessKeyId'], os.environ['AccessKeySecret'], os.environ['RamRoleARN'], os.environ['RoleSession'])
 
