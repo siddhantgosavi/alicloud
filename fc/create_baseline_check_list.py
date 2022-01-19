@@ -105,14 +105,17 @@ def handler():
         timestamp = str(datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S"))
         filename = 'baselineList_' + timestamp + '.csv'
 
-        with open(filename, 'w', newline='') as outf:
-            dw = csv.DictWriter(outf, instanceCheckWarnings[0].keys())
-            dw.writeheader()
-            for warning in instanceCheckWarnings:
-                dw.writerow(warning)
-        
-        print("\nBaseline list created in the file: ", filename)
-        print("Total baseline checks: " + str(len(instanceCheckWarnings)))
+        if(len(instanceCheckWarnings) != 0):
+            with open(filename, 'w', newline='') as outf:
+                dw = csv.DictWriter(outf, instanceCheckWarnings[0].keys())
+                dw.writeheader()
+                for warning in instanceCheckWarnings:
+                    dw.writerow(warning)
+            
+            print("\nBaseline list created in the file: ", filename)
+            print("Total baseline checks: " + str(len(instanceCheckWarnings)))
+        else:
+            print("No Baseline checks found !!!")
         
     except ClientException as e:
         print(e)
