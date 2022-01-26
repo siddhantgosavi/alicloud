@@ -97,7 +97,7 @@ def handler(event, context):
             logger.info(" Baseline Check Count: " + str(machineChecksData['TotalCount']))
 
             for machineWarning in machineChecksData['CheckWarnings']:
-                object = {
+                baseobject = {
                     'LastFoundTime': checkWarningSummary['LastFoundTime'],
                     'RiskName' : checkWarningSummary['RiskName'],
                     'RiskId' : checkWarningSummary['RiskId'],
@@ -112,7 +112,7 @@ def handler(event, context):
                     'Status' : ("Failed" if (machineWarning['Status'] == 1) else "Success")
                 }
 
-                instanceCheckWarnings.append(object)
+                instanceCheckWarnings.append(baseobject)
     
     timestamp = str(datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S"))
     filename = 'baselineList_' + timestamp + '.csv'
