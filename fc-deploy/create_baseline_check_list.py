@@ -46,7 +46,7 @@ def handler(event, context):
 
     ###############################################################################
 
-    logger.info("\nFetching baseline data...", end='')
+    logger.info("\nFetching baseline data...")
 
     request = DescribeCheckWarningSummaryRequest()
     request.set_accept_format('json')
@@ -65,7 +65,7 @@ def handler(event, context):
 
     for checkWarningSummary in checkWarningSummaryData['WarningSummarys']:
 
-        logger.info("\nFetching data from Baseline: " + checkWarningSummary['RiskName'] + "...", end='')
+        logger.info("\nFetching data from Baseline: " + checkWarningSummary['RiskName'] + "...")
         request = DescribeWarningMachinesRequest()
         request.set_accept_format('json')
         request.set_Lang("en")
@@ -82,7 +82,7 @@ def handler(event, context):
 
         for warningMachine in warningMachineData['WarningMachines']:
 
-            logger.info("\tFetching data for Instance: " + warningMachine['InstanceId'] + " : " + warningMachine['InstanceName'] + "...", end='')
+            logger.info("\tFetching data for Instance: " + warningMachine['InstanceId'] + " : " + warningMachine['InstanceName'] + "...")
             request = DescribeCheckWarningsRequest()
             request.set_accept_format('json')
             request.set_Lang("en")
