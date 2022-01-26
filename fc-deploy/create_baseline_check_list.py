@@ -11,11 +11,13 @@ from aliyunsdkcore.auth.credentials import StsTokenCredential
 from aliyunsdksas.request.v20181203.DescribeCheckWarningSummaryRequest import DescribeCheckWarningSummaryRequest
 from aliyunsdksas.request.v20181203.DescribeWarningMachinesRequest import DescribeWarningMachinesRequest
 from aliyunsdksas.request.v20181203.DescribeCheckWarningsRequest import DescribeCheckWarningsRequest
+import oss2
 
 def handler(event, context):
     logger = logging.getLogger()
-    logger.info('\nScript for creating a list of all vulnerabilities...')
-    folder = "/home/app/" + context.service.name + "/" + context.function.name
+    logger.info('\nScript for creating a list of all baseline checks...')
+    accountNumber = os.environ['RamRoleARN'].split(':')[3]
+    folder = "/home/app/" + context.service.name + "/" + accountNumber + "/"+ context.function.name
     if not os.path.exists(folder):
         os.makedirs(folder)
     os.chdir(folder)
@@ -126,5 +128,13 @@ def handler(event, context):
         
         logger.info("\nBaseline list created in the file: ", filename)
         logger.info("Total baseline checks: " + str(len(instanceCheckWarnings)))
+
+        stsAuth = oss2.StsAuth(object['Credentials']['AccessKeyId'], object['Credentials']['AccessKeySecret'], object['Credentials']['SecurityToken'])
+        bucket = oss2.Bucket(stsAuth, os.environ['Endpoint'], os.environ['BucketName'])
+        localFile = folder + "/" + filename
+        blobName = context.service.name + "/" + accountNumber + "/Baseline_List/" + filename
+
+        logger.info("\nUploading the file to oss bucket " + os.environ['BucketName'] + "/" + blobName)
+        bucket.put_object(blobName, localFile)
     else:
         logger.info("No Baseline checks found !!!")
