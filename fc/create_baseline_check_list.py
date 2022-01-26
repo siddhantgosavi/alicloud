@@ -32,7 +32,7 @@ def handler():
 
         client = AcsClient(region_id='us-west-1', credential=ramRoleArnCredentials)
 
-        print("\nFetching baseline catagories data...", end='')
+        print("\nFetching baseline data...", end='')
 
         request = DescribeCheckWarningSummaryRequest()
         request.set_accept_format('json')
@@ -45,7 +45,7 @@ def handler():
         response = client.do_action_with_exception(request)
 
         checkWarningSummaryData = json.loads(response)
-        print(" Catagories Count: " + str(checkWarningSummaryData['TotalCount']))
+        print("Baseline Count: " + str(checkWarningSummaryData['TotalCount']))
 
         instanceCheckWarnings = []
 
