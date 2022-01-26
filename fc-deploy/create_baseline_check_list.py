@@ -126,7 +126,7 @@ def handler(event, context):
             for warning in instanceCheckWarnings:
                 dw.writerow(warning)
         
-        logger.info("\nBaseline list created in the file: ", filename)
+        logger.info("\nBaseline list created in the file: " + filename)
         logger.info("Total baseline checks: " + str(len(instanceCheckWarnings)))
 
         stsAuth = oss2.StsAuth(object['Credentials']['AccessKeyId'], object['Credentials']['AccessKeySecret'], object['Credentials']['SecurityToken'])
