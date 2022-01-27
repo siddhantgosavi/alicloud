@@ -152,14 +152,13 @@ def sendEmail(file):
     mailserver = os.environ['MailServer']
     username = os.environ['SMTPUserName']
     password = os.environ['SMTPPassword']
-    toemails = [os.environ['ToMail']]
+    toemails = os.environ['ToMail'].split(',')
     subject = "Baseline Report FC"
     files = [file]
 
     msg = MIMEMultipart()
     msg['Subject'] = subject
     msg['From'] = '%s <%s>' % ('SecOps Automation', username)
-    msg['To'] = ','.join(toemails)
 
     htmlbody = MIMEText ("<p>Hi,</p><p>Reports are attached in the mail.</p><p>Thanks,<br>SecOps Automation</p>", _subtype='html', _charset='UTF-8')
     msg.attach(htmlbody)

@@ -14,7 +14,6 @@ files = ["vulnerability_list_cve_2022-01-27T16-49-28.csv", "baselineList_2022-01
 msg = MIMEMultipart()
 msg['Subject'] = subject
 msg['From'] = '%s <%s>' % ('SecOps Automation', username)
-msg['To'] = ','.join(toemails)
 
 htmlbody = MIMEText ("<p>Hi,</p><p>Reports are attached in the mail.</p><p>Thanks,<br>SecOps Automation</p>", _subtype='html', _charset='UTF-8')
 msg.attach(htmlbody)
