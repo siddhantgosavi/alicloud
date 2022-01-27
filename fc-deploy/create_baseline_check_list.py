@@ -116,7 +116,7 @@ def handler(event, context):
 
                 instanceCheckWarnings.append(baseobject)
     
-    timestamp = str(datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S"))
+    timestamp = str(datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%S"))
     filename = 'baselineList_' + timestamp + '.csv'
 
     if(len(instanceCheckWarnings) != 0):

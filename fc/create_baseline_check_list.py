@@ -6,6 +6,12 @@ import csv
 import sys
 from datetime import datetime
 
+import smtplib
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 from aliyunsdkcore.client import AcsClient
 from aliyunsdkcore.acs_exception.exceptions import ClientException
 from aliyunsdkcore.acs_exception.exceptions import ServerException
@@ -16,10 +22,16 @@ from aliyunsdksas.request.v20181203.DescribeCheckWarningsRequest import Describe
 
 if(len(sys.argv) == 1):
     RoleARN = input("Enter Role ARN: ")
+    toemail = input("Enter Email: ")
 elif(len(sys.argv) == 2):
     RoleARN = sys.argv[1]
+    toemail = input("Enter Email: ")
+elif(len(sys.argv) == 3):
+    RoleARN = sys.argv[1]
+    toemail = sys.argv[2]
 
 print("Role ARN: " + RoleARN)
+print("Email: " + toemail)
 
 RoleSession = "secops-create-baseline-list-session"
 
@@ -102,7 +114,7 @@ def handler():
 
                     instanceCheckWarnings.append(object)
         
-        timestamp = str(datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S"))
+        timestamp = str(datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%S"))
         filename = 'baselineList_' + timestamp + '.csv'
 
         if(len(instanceCheckWarnings) != 0):
@@ -114,6 +126,8 @@ def handler():
             
             print("\nBaseline list created in the file: ", filename)
             print("Total baseline checks: " + str(len(instanceCheckWarnings)))
+            print("Sending Email...")
+            sendEmail(filename, toemail)
         else:
             print("No Baseline checks found !!!")
         
@@ -123,5 +137,35 @@ def handler():
         print(e)
     except Exception as e:
         print(e)
+
+def sendEmail(file, toemail):
+    mailserver = os.environ['MailServer']
+    username = os.environ['SMTPUserName']
+    password = os.environ['SMTPPassword']
+    toemails = [toemail]
+    subject = "Baseline Report"
+    files = [file]
+
+    msg = MIMEMultipart()
+    msg['Subject'] = subject
+    msg['From'] = '%s <%s>' % ('SecOps Automation', username)
+    msg['To'] = ','.join(toemails)
+
+    htmlbody = MIMEText ("<p>Hi,</p><p>Reports are attached in the mail.</p><p>Thanks,<br>SecOps Automation</p>", _subtype='html', _charset='UTF-8')
+    msg.attach(htmlbody)
+
+    for file in files:
+        part = MIMEBase('application', "octet-stream")
+        part.set_payload(open(file, "rb").read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', 'attachment', filename=file)
+        msg.attach(part)
+
+    smtpclient = smtplib.SMTP_SSL(mailserver)
+    smtpclient.connect(mailserver)
+    smtpclient.login(username, password)
+
+    smtpclient.sendmail(username, toemails, msg.as_string())
+    smtpclient.close()
 
 handler()
