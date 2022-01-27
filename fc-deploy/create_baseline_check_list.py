@@ -153,7 +153,7 @@ def sendEmail(file):
     username = os.environ['SMTPUserName']
     password = os.environ['SMTPPassword']
     toemails = [os.environ['ToMail']]
-    subject = "Baseline Report"
+    subject = "Baseline Report FC"
     files = [file]
 
     msg = MIMEMultipart()
