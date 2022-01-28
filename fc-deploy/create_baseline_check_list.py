@@ -176,3 +176,4 @@ def sendEmail(file):
 
     smtpclient.sendmail(username, toemails, msg.as_string())
     smtpclient.close()
+    
