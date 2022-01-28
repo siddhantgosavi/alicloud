@@ -1,12 +1,13 @@
+import os
 import smtplib
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-mailserver = 'smtpdm-ap-southeast-1.aliyun.com'
-username = 'security@mail.knowgy.com'
-password = 'PassWord123'
+mailserver = os.environ['MailServer']
+username = os.environ['SMTPUserName']
+password = os.environ['SMTPPassword']
 toemails = ["siddhantgosavi23@gmail.com"]
 subject = "From SMTP Python Local"
 files = ["vulnerability_list_cve_2022-01-27T16-49-28.csv", "baselineList_2022-01-27T18-43-44.csv"]
