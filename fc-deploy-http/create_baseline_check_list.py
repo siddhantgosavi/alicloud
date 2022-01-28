@@ -19,15 +19,46 @@ from aliyunsdksas.request.v20181203.DescribeWarningMachinesRequest import Descri
 from aliyunsdksas.request.v20181203.DescribeCheckWarningsRequest import DescribeCheckWarningsRequest
 import oss2
 
-def handler(event, context):
+def handler(environ, start_response):
     logger = logging.getLogger()
     logger.info('\nScript for creating a list of all baseline checks...')
-    accountNumber = os.environ['RamRoleARN'].split(':')[3]
+    context = environ['fc.context']
+
+    ####################################  Input Validation  #######################################
+    try:        
+        request_body_size = int(environ.get('CONTENT_LENGTH', 0))
+    except (ValueError):        
+        request_body_size = 0
+
+    if (not request_body_size == 0):
+        request_body = environ['wsgi.input'].read(request_body_size) 
+        requestBody = json.loads(request_body)
+        logger.info(requestBody)
+
+        if(not (('RamRoleARN' in requestBody) and ('EmailAddress' in requestBody))):
+            logger.info('missing or incorrect parameters passed in the body. Correct parameters are RamRoleARN and EmailAddress')
+
+            status = '400 Bad Request'
+            response_headers = [('Content-type', 'application/json')]
+            start_response(status, response_headers)
+            return [b'missing or incorrect parameters passed in the body. Correct parameters are RamRoleARN and EmailAddress']
+
+    else:
+        status = '400 Bad Request'
+        response_headers = [('Content-type', 'application/json')]
+        start_response(status, response_headers)
+        return [b'No data']
+
+    #####################################   Initialization    ##################################### 
+
+    accountNumber = requestBody['RamRoleARN'].split(':')[3]
     folder = "/home/app/" + context.service.name + "/" + accountNumber + "/"+ context.function.name
     if not os.path.exists(folder):
         os.makedirs(folder)
     os.chdir(folder)
     os.system('echo $PWD')
+
+    #####################################   Authentication    ##################################### 
 
     # constructing credentials and acs client for the function compute
     sts_token_credential = StsTokenCredential(context.credentials.accessKeyId, context.credentials.accessKeySecret, context.credentials.securityToken)
@@ -38,7 +69,7 @@ def handler(event, context):
     request.set_accept_format('json')
 
     # Specify request parameters.
-    request.set_RoleArn(os.environ['RamRoleARN'])
+    request.set_RoleArn(requestBody['RamRoleARN'])
     request.set_RoleSessionName(os.environ['RoleSession'])
 
     # Initiate the request and obtain a response.
@@ -50,7 +81,7 @@ def handler(event, context):
     sts_token_credential = StsTokenCredential(assumeRoleData['Credentials']['AccessKeyId'], assumeRoleData['Credentials']['AccessKeySecret'], assumeRoleData['Credentials']['SecurityToken'])
     client = AcsClient(region_id='us-west-1', credential=sts_token_credential)
 
-    ###############################################################################
+    #####################################    Report Generation     ##################################
 
     logger.info("\nFetching baseline data...")
 
@@ -144,15 +175,20 @@ def handler(event, context):
         bucket.put_object(blobName, localFile)
 
         logger.info("Sending Email...")
-        sendEmail(filename)
+        sendEmail(filename, requestBody['EmailAddress'])
     else:
         logger.info("No Baseline checks found !!!")
 
-def sendEmail(file):
+    status = '200 OK'
+    response_headers = [('Content-type', 'application/json')]
+    start_response(status, response_headers)
+    return [json.dumps(requestBody).encode('utf-8')]
+
+def sendEmail(file, emails):
     mailserver = os.environ['MailServer']
     username = os.environ['SMTPUserName']
     password = os.environ['SMTPPassword']
-    toemails = os.environ['ToMail'].split(',')
+    toemails = emails.split(',')
     subject = "Baseline Report FC"
     files = [file]
 
