@@ -60,6 +60,8 @@ def handler(environ, start_response):
 
     #####################################   Authentication    ##################################### 
 
+    RoleSession = 'secops-baseline-check-list-session'
+
     # constructing credentials and acs client for the function compute
     sts_token_credential = StsTokenCredential(context.credentials.accessKeyId, context.credentials.accessKeySecret, context.credentials.securityToken)
     client = AcsClient(region_id='us-west-1', credential=sts_token_credential)
@@ -70,7 +72,7 @@ def handler(environ, start_response):
 
     # Specify request parameters.
     request.set_RoleArn(requestBody['RamRoleARN'])
-    request.set_RoleSessionName(os.environ['RoleSession'])
+    request.set_RoleSessionName(RoleSession)
 
     # Initiate the request and obtain a response.
     response = client.do_action_with_exception(request)
