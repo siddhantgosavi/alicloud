@@ -149,6 +149,7 @@ def sendEmail(file, toemail):
     msg = MIMEMultipart()
     msg['Subject'] = subject
     msg['From'] = '%s <%s>' % ('SecOps Automation', username)
+    msg['To'] = toemail
 
     htmlbody = MIMEText ("<p>Hi,</p><p>Reports are attached in the mail.</p><p>Thanks,<br>SecOps Automation</p>", _subtype='html', _charset='UTF-8')
     msg.attach(htmlbody)
