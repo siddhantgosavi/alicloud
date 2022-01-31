@@ -124,7 +124,7 @@ def handler():
                 for warning in instanceCheckWarnings:
                     dw.writerow(warning)
             
-            print("\nBaseline list created in the file: ", filename)
+            print("\nBaseline list created in the file: " + filename)
             print("Total baseline checks: " + str(len(instanceCheckWarnings)))
             print("Sending Email...")
             sendEmail(filename, toemail)
