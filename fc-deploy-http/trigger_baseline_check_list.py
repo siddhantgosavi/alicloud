@@ -28,7 +28,7 @@ def handler(event, context):
             torun.append(schedule)
 
     for run in torun:
-        logger.info("\nExecuting the Baseline check list for the following parameters")
+        logger.info("Executing the Baseline check list for the following parameters")
         logger.info("RoleARN: " + run['RoleARN'])
         logger.info("EmailAddress: " + run['EmailAddress'])
 
