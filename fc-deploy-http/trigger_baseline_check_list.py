@@ -7,7 +7,7 @@ import requests
 
 def handler(event, context):
     logger = logging.getLogger()
-    file = open("create_vulnerability_list.json", 'r')
+    file = open("create_baseline_check_list.json", 'r')
     schedules = json.loads(file.read())
 
     utcnow = datetime.utcnow()
@@ -28,16 +28,14 @@ def handler(event, context):
             torun.append(schedule)
 
     for run in torun:
-        logger.info("\nExecuting the vulnerability list for the following parameters")
+        logger.info("\nExecuting the Baseline check list for the following parameters")
         logger.info("RoleARN: " + run['RoleARN'])
-        logger.info("VulnerabilityType " + run['VulnerabilityType'])
         logger.info("EmailAddress: " + run['EmailAddress'])
 
-        url = "https://5680671669106366.us-west-1.fc.aliyuncs.com/2016-08-15/proxy/SecurityCenterAutomation.LATEST/create_vulnerability_list_http/"
+        url = "https://5680671669106366.us-west-1.fc.aliyuncs.com/2016-08-15/proxy/SecurityCenterAutomation.LATEST/create_baseline_check_list_http/"
 
         body = {
             'RamRoleARN': run['RoleARN'],
-            'VulnerabilityType': run['VulnerabilityType'],
             'EmailAddress': run['EmailAddress']
         }
 

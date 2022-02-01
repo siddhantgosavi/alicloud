@@ -1,0 +1,9 @@
+[
+    {
+        "RoleARN": "acs:ram::5680671669106366:role/customsecuritymanagerrole",
+        "EmailAddress": "Siddhant Gosavi <siddhantgosavi23@gmail.com>",
+        "DateOfMonth": [],
+        "DayOfWeek": ["Monday"],
+        "HourOfDay": 18
+    }
+]
