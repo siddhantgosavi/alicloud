@@ -40,4 +40,4 @@ def handler(event, context):
         }
 
         requests.post(url, json.dumps(body))
-        logger.info("")
+        print("")
