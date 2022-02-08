@@ -84,6 +84,10 @@ def handler():
         else:
             print("No Config Assesment checks found !!!")
 
+    except ClientException as e:
+        print(e)
+    except ServerException as e:
+        print(e)
     except Exception as e:
         print(e)
 
