@@ -41,7 +41,7 @@ RoleSession = "secops-combined-list-session"
 def handler():
     try:
         logger = logging.getLogger()
-        print('\nScript for creating a list of config assesments, baselines and vulnerabilities...')
+        print('\nScript for creating a combined list of config assesments, baselines and vulnerabilities...\n')
 
         ramRoleArnCredentials = RamRoleArnCredential(os.environ['AccessKeyId'], os.environ['AccessKeySecret'], RoleARN, RoleSession)
 
