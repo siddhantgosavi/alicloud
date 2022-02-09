@@ -76,6 +76,8 @@ def handler():
                 'AffectedAssetsCount': config['AffectedCount'],
                 'ConfigType': config['Type'],
                 'LastFoundTime' :  str(datetime.fromtimestamp(config['CheckTime']/1000).strftime("%Y-%m-%d %H:%M:%S")),
+                'FirstScanTime' : '',
+                'LatestScanTime' :  str(datetime.fromtimestamp(config['CheckTime']/1000).strftime("%Y-%m-%d %H:%M:%S")),
                 'RiskName' : '',
                 'RiskId' : '',
                 'InstanceId' : '',
@@ -89,8 +91,6 @@ def handler():
                 'VulnerabilityName' : '',
                 "CVE" : '',
                 'Impact' : '',
-                'FirstScanTime' : '',
-                'LatestScanTime' :  str(datetime.fromtimestamp(config['CheckTime']/1000).strftime("%Y-%m-%d %H:%M:%S")),
                 'Priority' :  '',
                 'AffectedSoftware' : '',
                 'SoftwarePath' : '',
@@ -132,6 +132,39 @@ def handler():
 
         highVulData = [v for v in (cveResponseData['VulRecords'] + sysResponseData['VulRecords']) if v['Level'] == "high"]
 
+        if(len(highVulData) == 0):
+            combinedObject = {
+                'Kind': "Vulnerability",
+                'Config': '',
+                'Severity/Level': '',
+                'Status' : '',
+                'AffectedAssetsCount': '',
+                'ConfigType': '',
+                'LastFoundTime' :  '',
+                'FirstScanTime' : '',
+                'LatestScanTime' :  '',
+                'RiskName' : '',
+                'RiskId' : '',
+                'InstanceId' : '',
+                'InstanceName' : '',
+                'RegionId' : '',
+                'PublicIp' : '',
+                'PrivateIp' : '',
+                'Item' : '',
+                'Type' : '',
+                'RegionId': '',
+                'VulnerabilityName' : '',
+                "CVE" : '',
+                'Impact' : '',
+                'Priority' :  '',
+                'AffectedSoftware' : '',
+                'SoftwarePath' : '',
+                'Cause' :  '',
+                'Fix' : '',
+                'Summary': '',
+            }
+            combinedList.append(combinedObject)
+
         for vul in highVulData:
 
             request = DescribeVulDetailsRequest()
@@ -153,6 +186,8 @@ def handler():
                 'AffectedAssetsCount': '',
                 'ConfigType': '',
                 'LastFoundTime' :  '',
+                'FirstScanTime' : str(datetime.fromtimestamp(vul['FirstTs']/1000).strftime("%Y-%m-%d %H:%M:%S")),
+                'LatestScanTime' :  str(datetime.fromtimestamp(vul['LastTs']/1000).strftime("%Y-%m-%d %H:%M:%S")),
                 'RiskName' : '',
                 'RiskId' : '',
                 'InstanceId' : str(vul['InstanceId']),
@@ -166,8 +201,6 @@ def handler():
                 'VulnerabilityName' : vul['AliasName'],
                 "CVE" : vul['Related'],
                 'Impact' : vul['ExtendContentJson']['Necessity'].get('Cvss_factor',''),
-                'FirstScanTime' : str(datetime.fromtimestamp(vul['FirstTs']/1000).strftime("%Y-%m-%d %H:%M:%S")),
-                'LatestScanTime' :  str(datetime.fromtimestamp(vul['LastTs']/1000).strftime("%Y-%m-%d %H:%M:%S")),
                 'Priority' :  "high" if vul['Necessity'] == "asap" else "medium" if vul['Necessity'] == "later" else "low",
                 'AffectedSoftware' : ('\n').join([str(r['Name'] + " " + r['FullVersion']) for r in vul['ExtendContentJson']['RpmEntityList']]),
                 'SoftwarePath' : ('\n').join([r['Path'] for r in vul['ExtendContentJson']['RpmEntityList']]),
@@ -238,6 +271,8 @@ def handler():
                         'AffectedAssetsCount': '',
                         'ConfigType': '',
                         'LastFoundTime': checkWarningSummary['LastFoundTime'],
+                        'FirstScanTime' : '',
+                        'LatestScanTime' :  '',
                         'RiskName' : checkWarningSummary['RiskName'],
                         'RiskId' : checkWarningSummary['RiskId'],
                         'InstanceId' : warningMachine['InstanceId'],
@@ -251,8 +286,6 @@ def handler():
                         'VulnerabilityName' : '',
                         "CVE" : '',
                         'Impact' : '',
-                        'FirstScanTime' : '',
-                        'LatestScanTime' :  '',
                         'Priority' :  '',
                         'AffectedSoftware' : '',
                         'SoftwarePath' : '',
