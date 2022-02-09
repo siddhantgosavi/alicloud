@@ -75,7 +75,7 @@ def handler():
                 'Status' : config['Status'],
                 'AffectedAssetsCount': config['AffectedCount'],
                 'ConfigType': config['Type'],
-                'LastFoundTime' :  str(datetime.fromtimestamp(config['CheckTime']/1000).strftime("%Y-%m-%d %H:%M:%S")),
+                'LastFoundTime' :  '',
                 'FirstScanTime' : '',
                 'LatestScanTime' :  str(datetime.fromtimestamp(config['CheckTime']/1000).strftime("%Y-%m-%d %H:%M:%S")),
                 'RiskName' : '',
