@@ -126,8 +126,11 @@ def handler():
             
             print("\nBaseline list created in the file: " + filename)
             print("Total baseline checks: " + str(len(instanceCheckWarnings)))
-            print("Sending Email...")
-            sendEmail(filename, toemail)
+            if(toemail):
+                print("Sending Email...")
+                sendEmail(filename, toemail)
+            else:
+                print("Email is not given")
         else:
             print("No Baseline checks found !!!")
         

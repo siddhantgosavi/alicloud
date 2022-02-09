@@ -79,8 +79,11 @@ def handler():
                     dw.writerow(warning)
             
             print("\nConfig Assesment list created in the file: " + filename)
-            print("Sending Email...")
-            sendEmail(filename, toemail)
+            if(toemail):
+                print("Sending Email...")
+                sendEmail(filename, toemail)
+            else:
+                print("Email is not given")
         else:
             print("No Config Assesment checks found !!!")
 
