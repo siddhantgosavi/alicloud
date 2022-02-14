@@ -37,6 +37,7 @@ print("Role ARN: " + RoleARN)
 print("Email: " + toemail)
 
 RoleSession = "secops-combined-list-session"
+accountNumber = RoleARN.split(':')[3]
 
 def handler():
     try:
@@ -296,7 +297,7 @@ def handler():
                     combinedList.append(combinedObject)
 
         timestamp = str(datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%S"))
-        filename = 'combined_list_' + timestamp + '.csv'
+        filename = 'combined_list_' + accountNumber + '_' + timestamp + '.csv'
 
         if(len(combinedList) != 0):
             with open(filename, 'w', newline='') as outf:
