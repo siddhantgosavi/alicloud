@@ -65,11 +65,12 @@ def handler():
 
         combinedList = []
 
-        highConfigData = [c for c in configData['List'] if (c['RiskLevel'] == "high")]
+        highConfigData = [c for c in configData['List'] if ((c['RiskLevel'] == "high") and (c['Status'] == "failed"))]
 
         for config in highConfigData:
 
             combinedObject = {
+                'AccountId': accountNumber,
                 'Kind': "ConfigAssesment",
                 'Config': config['Title'],
                 'Severity/Level': config['RiskLevel'],
@@ -135,10 +136,11 @@ def handler():
 
         if(len(highVulData) == 0):
             combinedObject = {
+                'AccountId': accountNumber,
                 'Kind': "Vulnerability",
                 'Config': '',
                 'Severity/Level': '',
-                'Status' : '',
+                'Status' : 'Failed',
                 'AffectedAssetsCount': '',
                 'ConfigType': '',
                 'LastFoundTime' :  '',
@@ -180,6 +182,7 @@ def handler():
             vulDetailData = json.loads(response)
             
             combinedObject = {
+                'AccountId': accountNumber,
                 'Kind': "Vulnerability",
                 'Config': '',
                 'Severity/Level': vul['Level'],
@@ -261,10 +264,11 @@ def handler():
                 machineChecksData = json.loads(response)
                 #print(" Baseline Check Count: " + str(machineChecksData['TotalCount']))
 
-                highMachineChecksData = [m for m in machineChecksData['CheckWarnings'] if m['Level'] == "high"]
+                highMachineChecksData = [m for m in machineChecksData['CheckWarnings'] if ((m['Level'] == "high") and (m['Status'] == 1))]
 
                 for machineWarning in highMachineChecksData:
                     combinedObject = {
+                        'AccountId': accountNumber,
                         'Kind': "Baseline",
                         'Config': '',
                         'Severity/Level': machineWarning['Level'],
