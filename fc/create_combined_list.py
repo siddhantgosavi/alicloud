@@ -24,284 +24,297 @@ from aliyunsdksas.request.v20181203.DescribeCheckWarningsRequest import Describe
 from aliyunsdksas.request.v20181203.DescribeRiskCheckResultRequest import DescribeRiskCheckResultRequest
 
 if(len(sys.argv) == 1):
-    RoleARN = input("Enter Role ARN: ")
+    RoleARNs = input("Enter Role ARNs: ")
     toemail = input("Enter Email: ")
 elif(len(sys.argv) == 2):
-    RoleARN = sys.argv[1]
+    RoleARNs = sys.argv[1]
     toemail = input("Enter Email: ")
 elif(len(sys.argv) == 3):
-    RoleARN = sys.argv[1]
+    RoleARNs = sys.argv[1]
     toemail = sys.argv[2]
 
-print("Role ARN: " + RoleARN)
+print("Role ARNs: " + RoleARNs)
 print("Email: " + toemail)
 
 RoleSession = "secops-combined-list-session"
-accountNumber = RoleARN.split(':')[3]
 
 def handler():
     try:
         logger = logging.getLogger()
         print('\nScript for creating a combined list of config assesments, baselines and vulnerabilities...\n')
 
-        ramRoleArnCredentials = RamRoleArnCredential(os.environ['AccessKeyId'], os.environ['AccessKeySecret'], RoleARN, RoleSession)
-
-        client = AcsClient(region_id='us-west-1', credential=ramRoleArnCredentials)
-
-        ##################### Config Assessment #####################
-
-        print("\nFetching data for Config Assesment...\n")
-        request = DescribeRiskCheckResultRequest()
-        request.set_accept_format('json')
-        request.set_Lang("en")
-        request.set_PageSize(1)
-
-        response = client.do_action_with_exception(request)
-        request.set_PageSize(json.loads(response)['TotalCount'])
-
-        response = client.do_action_with_exception(request)
-
-        configData = json.loads(response)
-
         combinedList = []
 
-        highConfigData = [c for c in configData['List'] if ((c['RiskLevel'] == "high") and (c['Status'] == "failed"))]
+        for RoleARN in RoleARNs.split(','):
 
-        for config in highConfigData:
+            ramRoleArnCredentials = RamRoleArnCredential(os.environ['AccessKeyId'], os.environ['AccessKeySecret'], RoleARN, RoleSession)
 
-            combinedObject = {
-                'AccountId': accountNumber,
-                'Kind': "ConfigAssesment",
-                'Config': config['Title'],
-                'Severity/Level': config['RiskLevel'],
-                'Status' : config['Status'],
-                'AffectedAssetsCount': config['AffectedCount'],
-                'ConfigType': config['Type'],
-                'LastFoundTime' :  '',
-                'FirstScanTime' : '',
-                'LatestScanTime' :  str(datetime.fromtimestamp(config['CheckTime']/1000).strftime("%Y-%m-%d %H:%M:%S")),
-                'RiskName' : '',
-                'RiskId' : '',
-                'InstanceId' : '',
-                'InstanceName' : '',
-                'RegionId' : '',
-                'PublicIp' : '',
-                'PrivateIp' : '',
-                'Item' : '',
-                'Type' : '',
-                'RegionId': '',
-                'VulnerabilityName' : '',
-                "CVE" : '',
-                'Impact' : '',
-                'Priority' :  '',
-                'AffectedSoftware' : '',
-                'SoftwarePath' : '',
-                'Cause' :  '',
-                'Fix' : '',
-                'Summary': ''
-            }
+            client = AcsClient(region_id='us-west-1', credential=ramRoleArnCredentials)
 
-            combinedList.append(combinedObject)
+            accountNumber = RoleARN.split(':')[3]
 
-        ##################### Vulnerbaility #####################
+            file = open("account_display_names.json", 'r')
+            accounts = json.loads(file.read())
+            accountDisplayName = [a['DisplayName'] for a in accounts['Accounts'] if a['AccountId'] == accountNumber][0]
 
-        print("\nFetching data for Vulnerbilities...\n")
-        request = DescribeVulListRequest()
-        request.set_accept_format('json')
-        request.set_Lang("en")
-        request.set_Type("cve")
-        request.set_PageSize(1)
+            print("Running on account " + accountNumber + " - " + accountDisplayName)
 
-        response = client.do_action_with_exception(request)            
-        request.set_PageSize(json.loads(response)['TotalCount'])
+            ##################### Config Assessment #####################
 
-        response = client.do_action_with_exception(request)
-
-        cveResponseData = json.loads(response)
-
-        request = DescribeVulListRequest()
-        request.set_accept_format('json')
-        request.set_Lang("en")
-        request.set_Type("sys")
-        request.set_PageSize(1)
-
-        response = client.do_action_with_exception(request)            
-        request.set_PageSize(json.loads(response)['TotalCount'])
-
-        response = client.do_action_with_exception(request)
-
-        sysResponseData = json.loads(response)
-
-        highVulData = [v for v in (cveResponseData['VulRecords'] + sysResponseData['VulRecords']) if v['Level'] == "high"]
-
-        if(len(highVulData) == 0):
-            combinedObject = {
-                'AccountId': accountNumber,
-                'Kind': "Vulnerability",
-                'Config': '',
-                'Severity/Level': '',
-                'Status' : 'Failed',
-                'AffectedAssetsCount': '',
-                'ConfigType': '',
-                'LastFoundTime' :  '',
-                'FirstScanTime' : '',
-                'LatestScanTime' :  '',
-                'RiskName' : '',
-                'RiskId' : '',
-                'InstanceId' : '',
-                'InstanceName' : '',
-                'RegionId' : '',
-                'PublicIp' : '',
-                'PrivateIp' : '',
-                'Item' : '',
-                'Type' : '',
-                'RegionId': '',
-                'VulnerabilityName' : '',
-                "CVE" : '',
-                'Impact' : '',
-                'Priority' :  '',
-                'AffectedSoftware' : '',
-                'SoftwarePath' : '',
-                'Cause' :  '',
-                'Fix' : '',
-                'Summary': '',
-            }
-            combinedList.append(combinedObject)
-
-        for vul in highVulData:
-
-            request = DescribeVulDetailsRequest()
-            request.set_accept_format('json')
-
-            request.set_Type(vul['Type'])
-            request.set_Name(vul['Name'])
-            request.set_Lang("en")
-
-            response = client.do_action_with_exception(request)
-
-            vulDetailData = json.loads(response)
-            
-            combinedObject = {
-                'AccountId': accountNumber,
-                'Kind': "Vulnerability",
-                'Config': '',
-                'Severity/Level': vul['Level'],
-                'Status' : '',
-                'AffectedAssetsCount': '',
-                'ConfigType': '',
-                'LastFoundTime' :  '',
-                'FirstScanTime' : str(datetime.fromtimestamp(vul['FirstTs']/1000).strftime("%Y-%m-%d %H:%M:%S")),
-                'LatestScanTime' :  str(datetime.fromtimestamp(vul['LastTs']/1000).strftime("%Y-%m-%d %H:%M:%S")),
-                'RiskName' : '',
-                'RiskId' : '',
-                'InstanceId' : str(vul['InstanceId']),
-                'InstanceName' : str(vul['InstanceName']),
-                'RegionId' : '',
-                'PublicIp' : '',
-                'PrivateIp' : '',
-                'Item' : '',
-                'Type' : '',
-                'RegionId': vul['RegionId'],
-                'VulnerabilityName' : vul['AliasName'],
-                "CVE" : vul['Related'],
-                'Impact' : vul['ExtendContentJson']['Necessity'].get('Cvss_factor',''),
-                'Priority' :  "high" if vul['Necessity'] == "asap" else "medium" if vul['Necessity'] == "later" else "low",
-                'AffectedSoftware' : ('\n').join([str(r['Name'] + " " + r['FullVersion']) for r in vul['ExtendContentJson']['RpmEntityList']]),
-                'SoftwarePath' : ('\n').join([r['Path'] for r in vul['ExtendContentJson']['RpmEntityList']]),
-                'Cause' :  ('\n').join([r['MatchDetail'] for r in vul['ExtendContentJson']['RpmEntityList']]),
-                'Fix' : ('\n').join([r['UpdateCmd'] for r in vul['ExtendContentJson']['RpmEntityList']]),
-                'Summary': ('\n').join([d['Summary'] for d in vulDetailData['Cves']])
-            }
-            combinedList.append(combinedObject)
-
-        ##################### Baseline #####################
-
-        print("\nFetching data for Baseline...\n")
-        request = DescribeCheckWarningSummaryRequest()
-        request.set_accept_format('json')
-        request.set_Lang("en")
-        request.set_PageSize(1)
-
-        response = client.do_action_with_exception(request)
-        request.set_PageSize(json.loads(response)['TotalCount'])
-
-        response = client.do_action_with_exception(request)
-
-        checkWarningSummaryData = json.loads(response)
-
-        for checkWarningSummary in checkWarningSummaryData['WarningSummarys']:
-
-            #print("\nFetching data from Baseline: " + checkWarningSummary['RiskName'] + "...", end='')
-            request = DescribeWarningMachinesRequest()
+            print("\nFetching data for Config Assesment...\n")
+            request = DescribeRiskCheckResultRequest()
             request.set_accept_format('json')
             request.set_Lang("en")
             request.set_PageSize(1)
-
-            request.set_RiskId(checkWarningSummary['RiskId'])
 
             response = client.do_action_with_exception(request)
             request.set_PageSize(json.loads(response)['TotalCount'])
 
             response = client.do_action_with_exception(request)
-            warningMachineData = json.loads(response)
-            #print(" MachineCount: " + str(warningMachineData['TotalCount']) + "\n")
 
-            for warningMachine in warningMachineData['WarningMachines']:
+            configData = json.loads(response)
 
-                #print("\tFetching data for Instance: " + warningMachine['InstanceId'] + " : " + warningMachine['InstanceName'] + "...", end='')
-                request = DescribeCheckWarningsRequest()
+            highConfigData = [c for c in configData['List'] if ((c['RiskLevel'] == "high") and (c['Status'] == "failed"))]
+
+            for config in highConfigData:
+
+                combinedObject = {
+                    'AccountId': accountNumber,
+                    'Display Name' : accountDisplayName,
+                    'Kind': "ConfigAssesment",
+                    'Config': config['Title'],
+                    'Severity/Level': config['RiskLevel'],
+                    'Status' : config['Status'],
+                    'AffectedAssetsCount': config['AffectedCount'],
+                    'ConfigType': config['Type'],
+                    'LastFoundTime' :  '',
+                    'FirstScanTime' : '',
+                    'LatestScanTime' :  str(datetime.fromtimestamp(config['CheckTime']/1000).strftime("%Y-%m-%d %H:%M:%S")),
+                    'RiskName' : '',
+                    'RiskId' : '',
+                    'InstanceId' : '',
+                    'InstanceName' : '',
+                    'RegionId' : '',
+                    'PublicIp' : '',
+                    'PrivateIp' : '',
+                    'Item' : '',
+                    'Type' : '',
+                    'RegionId': '',
+                    'VulnerabilityName' : '',
+                    "CVE" : '',
+                    'Impact' : '',
+                    'Priority' :  '',
+                    'AffectedSoftware' : '',
+                    'SoftwarePath' : '',
+                    'Cause' :  '',
+                    'Fix' : '',
+                    'Summary': ''
+                }
+
+                combinedList.append(combinedObject)
+
+            ##################### Vulnerbaility #####################
+
+            print("\nFetching data for Vulnerbilities...\n")
+            request = DescribeVulListRequest()
+            request.set_accept_format('json')
+            request.set_Lang("en")
+            request.set_Type("cve")
+            request.set_PageSize(1)
+
+            response = client.do_action_with_exception(request)            
+            request.set_PageSize(json.loads(response)['TotalCount'])
+
+            response = client.do_action_with_exception(request)
+
+            cveResponseData = json.loads(response)
+
+            request = DescribeVulListRequest()
+            request.set_accept_format('json')
+            request.set_Lang("en")
+            request.set_Type("sys")
+            request.set_PageSize(1)
+
+            response = client.do_action_with_exception(request)            
+            request.set_PageSize(json.loads(response)['TotalCount'])
+
+            response = client.do_action_with_exception(request)
+
+            sysResponseData = json.loads(response)
+
+            highVulData = [v for v in (cveResponseData['VulRecords'] + sysResponseData['VulRecords']) if v['Level'] == "high"]
+
+            if(len(highVulData) == 0):
+                combinedObject = {
+                    'AccountId': accountNumber,
+                    'Display Name' : accountDisplayName,
+                    'Kind': "Vulnerability",
+                    'Config': '',
+                    'Severity/Level': '',
+                    'Status' : '',
+                    'AffectedAssetsCount': '',
+                    'ConfigType': '',
+                    'LastFoundTime' :  '',
+                    'FirstScanTime' : '',
+                    'LatestScanTime' :  '',
+                    'RiskName' : '',
+                    'RiskId' : '',
+                    'InstanceId' : '',
+                    'InstanceName' : '',
+                    'RegionId' : '',
+                    'PublicIp' : '',
+                    'PrivateIp' : '',
+                    'Item' : '',
+                    'Type' : '',
+                    'RegionId': '',
+                    'VulnerabilityName' : '',
+                    "CVE" : '',
+                    'Impact' : '',
+                    'Priority' :  '',
+                    'AffectedSoftware' : '',
+                    'SoftwarePath' : '',
+                    'Cause' :  '',
+                    'Fix' : '',
+                    'Summary': '',
+                }
+                combinedList.append(combinedObject)
+
+            for vul in highVulData:
+
+                request = DescribeVulDetailsRequest()
+                request.set_accept_format('json')
+
+                request.set_Type(vul['Type'])
+                request.set_Name(vul['Name'])
+                request.set_Lang("en")
+
+                response = client.do_action_with_exception(request)
+
+                vulDetailData = json.loads(response)
+                
+                combinedObject = {
+                    'AccountId': accountNumber,
+                    'Display Name' : accountDisplayName,
+                    'Kind': "Vulnerability",
+                    'Config': '',
+                    'Severity/Level': vul['Level'],
+                    'Status' : '',
+                    'AffectedAssetsCount': '',
+                    'ConfigType': '',
+                    'LastFoundTime' :  '',
+                    'FirstScanTime' : str(datetime.fromtimestamp(vul['FirstTs']/1000).strftime("%Y-%m-%d %H:%M:%S")),
+                    'LatestScanTime' :  str(datetime.fromtimestamp(vul['LastTs']/1000).strftime("%Y-%m-%d %H:%M:%S")),
+                    'RiskName' : '',
+                    'RiskId' : '',
+                    'InstanceId' : str(vul['InstanceId']),
+                    'InstanceName' : str(vul['InstanceName']),
+                    'RegionId' : '',
+                    'PublicIp' : '',
+                    'PrivateIp' : '',
+                    'Item' : '',
+                    'Type' : '',
+                    'RegionId': vul['RegionId'],
+                    'VulnerabilityName' : vul['AliasName'],
+                    "CVE" : vul['Related'],
+                    'Impact' : vul['ExtendContentJson']['Necessity'].get('Cvss_factor',''),
+                    'Priority' :  "high" if vul['Necessity'] == "asap" else "medium" if vul['Necessity'] == "later" else "low",
+                    'AffectedSoftware' : ('\n').join([str(r['Name'] + " " + r['FullVersion']) for r in vul['ExtendContentJson']['RpmEntityList']]),
+                    'SoftwarePath' : ('\n').join([r['Path'] for r in vul['ExtendContentJson']['RpmEntityList']]),
+                    'Cause' :  ('\n').join([r['MatchDetail'] for r in vul['ExtendContentJson']['RpmEntityList']]),
+                    'Fix' : ('\n').join([r['UpdateCmd'] for r in vul['ExtendContentJson']['RpmEntityList']]),
+                    'Summary': ('\n').join([d['Summary'] for d in vulDetailData['Cves']])
+                }
+                combinedList.append(combinedObject)
+
+            ##################### Baseline #####################
+
+            print("\nFetching data for Baseline...\n")
+            request = DescribeCheckWarningSummaryRequest()
+            request.set_accept_format('json')
+            request.set_Lang("en")
+            request.set_PageSize(1)
+
+            response = client.do_action_with_exception(request)
+            request.set_PageSize(json.loads(response)['TotalCount'])
+
+            response = client.do_action_with_exception(request)
+
+            checkWarningSummaryData = json.loads(response)
+
+            for checkWarningSummary in checkWarningSummaryData['WarningSummarys']:
+
+                #print("\nFetching data from Baseline: " + checkWarningSummary['RiskName'] + "...", end='')
+                request = DescribeWarningMachinesRequest()
                 request.set_accept_format('json')
                 request.set_Lang("en")
                 request.set_PageSize(1)
 
-                request.set_Uuid(warningMachine['Uuid'])
                 request.set_RiskId(checkWarningSummary['RiskId'])
 
                 response = client.do_action_with_exception(request)
                 request.set_PageSize(json.loads(response)['TotalCount'])
 
                 response = client.do_action_with_exception(request)
-                machineChecksData = json.loads(response)
-                #print(" Baseline Check Count: " + str(machineChecksData['TotalCount']))
+                warningMachineData = json.loads(response)
+                #print(" MachineCount: " + str(warningMachineData['TotalCount']) + "\n")
 
-                highMachineChecksData = [m for m in machineChecksData['CheckWarnings'] if ((m['Level'] == "high") and (m['Status'] == 1))]
+                for warningMachine in warningMachineData['WarningMachines']:
 
-                for machineWarning in highMachineChecksData:
-                    combinedObject = {
-                        'AccountId': accountNumber,
-                        'Kind': "Baseline",
-                        'Config': '',
-                        'Severity/Level': machineWarning['Level'],
-                        'Status' : ("Failed" if (machineWarning['Status'] == 1) else "Success"),
-                        'AffectedAssetsCount': '',
-                        'ConfigType': '',
-                        'LastFoundTime': checkWarningSummary['LastFoundTime'],
-                        'FirstScanTime' : '',
-                        'LatestScanTime' :  '',
-                        'RiskName' : checkWarningSummary['RiskName'],
-                        'RiskId' : checkWarningSummary['RiskId'],
-                        'InstanceId' : warningMachine['InstanceId'],
-                        'InstanceName' : warningMachine['InstanceName'],
-                        'RegionId' : warningMachine['RegionId'],
-                        'PublicIp' : warningMachine['InternetIp'],
-                        'PrivateIp' : warningMachine['IntranetIp'],
-                        'Item' : machineWarning['Item'],
-                        'Type' : machineWarning['Type'],
-                        'RegionId': '',
-                        'VulnerabilityName' : '',
-                        "CVE" : '',
-                        'Impact' : '',
-                        'Priority' :  '',
-                        'AffectedSoftware' : '',
-                        'SoftwarePath' : '',
-                        'Cause' :  '',
-                        'Fix' : '',
-                        'Summary': '',
-                    }
-                    combinedList.append(combinedObject)
+                    #print("\tFetching data for Instance: " + warningMachine['InstanceId'] + " : " + warningMachine['InstanceName'] + "...", end='')
+                    request = DescribeCheckWarningsRequest()
+                    request.set_accept_format('json')
+                    request.set_Lang("en")
+                    request.set_PageSize(1)
+
+                    request.set_Uuid(warningMachine['Uuid'])
+                    request.set_RiskId(checkWarningSummary['RiskId'])
+
+                    response = client.do_action_with_exception(request)
+                    request.set_PageSize(json.loads(response)['TotalCount'])
+
+                    response = client.do_action_with_exception(request)
+                    machineChecksData = json.loads(response)
+                    #print(" Baseline Check Count: " + str(machineChecksData['TotalCount']))
+
+                    highMachineChecksData = [m for m in machineChecksData['CheckWarnings'] if ((m['Level'] == "high") and (m['Status'] == 1))]
+
+                    for machineWarning in highMachineChecksData:
+                        combinedObject = {
+                            'AccountId': accountNumber,
+                            'Display Name' : accountDisplayName,
+                            'Kind': "Baseline",
+                            'Config': '',
+                            'Severity/Level': machineWarning['Level'],
+                            'Status' : ("Failed" if (machineWarning['Status'] == 1) else "Success"),
+                            'AffectedAssetsCount': '',
+                            'ConfigType': '',
+                            'LastFoundTime': checkWarningSummary['LastFoundTime'],
+                            'FirstScanTime' : '',
+                            'LatestScanTime' :  '',
+                            'RiskName' : checkWarningSummary['RiskName'],
+                            'RiskId' : checkWarningSummary['RiskId'],
+                            'InstanceId' : warningMachine['InstanceId'],
+                            'InstanceName' : warningMachine['InstanceName'],
+                            'RegionId' : warningMachine['RegionId'],
+                            'PublicIp' : warningMachine['InternetIp'],
+                            'PrivateIp' : warningMachine['IntranetIp'],
+                            'Item' : machineWarning['Item'],
+                            'Type' : machineWarning['Type'],
+                            'RegionId': '',
+                            'VulnerabilityName' : '',
+                            "CVE" : '',
+                            'Impact' : '',
+                            'Priority' :  '',
+                            'AffectedSoftware' : '',
+                            'SoftwarePath' : '',
+                            'Cause' :  '',
+                            'Fix' : '',
+                            'Summary': '',
+                        }
+                        combinedList.append(combinedObject)
 
         timestamp = str(datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%S"))
-        filename = 'combined_list_' + accountNumber + '_' + timestamp + '.csv'
+        filename = 'combined_list_' + timestamp + '.csv'
 
         if(len(combinedList) != 0):
             with open(filename, 'w', newline='') as outf:

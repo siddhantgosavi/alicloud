@@ -1,0 +1,124 @@
+{
+    "Accounts": [
+        {
+            "AccountId": "1769644310991553",
+            "DisplayName": "LP-0005-ICP",
+            "FolderId": "fd-hOUI3BSZ6I"
+        },
+        {
+            "AccountId": "1674444287474716",
+            "DisplayName": "LC-Z005-SSL",
+            "FolderId": "fd-mjgkwBYBtn"
+        },
+        {
+            "AccountId": "1359641536006102",
+            "DisplayName": "LS-0009-HSSEmini",
+            "FolderId": "fd-tcTq0q4Prk"
+        },
+        {
+            "AccountId": "1063940763092244",
+            "DisplayName": "LS-000B-CastrolWeb",
+            "FolderId": "fd-tcTq0q4Prk"
+        },
+        {
+            "AccountId": "1249640048997519",
+            "DisplayName": "LS-000A-E-invoice",
+            "FolderId": "fd-tcTq0q4Prk"
+        },
+        {
+            "AccountId": "1808839987233186",
+            "DisplayName": "LS-0007-ChinaMI",
+            "FolderId": "fd-dv1omxaBXm"
+        },
+        {
+            "AccountId": "1660839722374257",
+            "DisplayName": "LS-0008-IWS",
+            "FolderId": "fd-dv1omxaBXm"
+        },
+        {
+            "AccountId": "1707435834566020",
+            "DisplayName": "LC-Z004-Pipeline",
+            "FolderId": "fd-mjgkwBYBtn"
+        },
+        {
+            "AccountId": "1224534108702476",
+            "DisplayName": "LC-Z002-ZScalar",
+            "FolderId": "fd-mjgkwBYBtn"
+        },
+        {
+            "AccountId": "1600234108810629",
+            "DisplayName": "LC-Z003-Aruba",
+            "FolderId": "fd-mjgkwBYBtn"
+        },
+        {
+            "AccountId": "1682733770015538",
+            "DisplayName": "LC-Z001-ADDomain",
+            "FolderId": "fd-mjgkwBYBtn"
+        },
+        {
+            "AccountId": "1052934523820759",
+            "DisplayName": "LS-0006-shenzhou",
+            "FolderId": "fd-tcTq0q4Prk"
+        },
+        {
+            "AccountId": "1750434109764625",
+            "DisplayName": "LC-0003-Aruba",
+            "FolderId": "fd-Up5xCnlRLd"
+        },
+        {
+            "AccountId": "1490034109729619",
+            "DisplayName": "LC-0002-ZScalar",
+            "FolderId": "fd-Up5xCnlRLd"
+        },
+        {
+            "AccountId": "1605233767664023",
+            "DisplayName": "LC-0001-ADDomain",
+            "FolderId": "fd-Up5xCnlRLd"
+        },
+        {
+            "AccountId": "1042232447452596",
+            "DisplayName": "LS-0003-shenzhou",
+            "FolderId": "fd-dv1omxaBXm"
+        },
+        {
+            "AccountId": "1338331870586766",
+            "DisplayName": "LS-0005-rainbow",
+            "FolderId": "fd-tcTq0q4Prk"
+        },
+        {
+            "AccountId": "1754731159645927",
+            "DisplayName": "LP-0004-DevOps",
+            "FolderId": "fd-hOUI3BSZ6I"
+        },
+        {
+            "AccountId": "1748929433994911",
+            "DisplayName": "LS-0002-Migration",
+            "FolderId": "fd-dv1omxaBXm"
+        },
+        {
+            "AccountId": "1099525715119566",
+            "DisplayName": "LS-0001-Platform",
+            "FolderId": "fd-dv1omxaBXm"
+        },
+        {
+            "AccountId": "1544023983080472",
+            "DisplayName": "LS-0004-M365",
+            "FolderId": "fd-dv1omxaBXm"
+        },
+        {
+            "AccountId": "1212623982971542",
+            "DisplayName": "LP-0003-Log",
+            "FolderId": "fd-hOUI3BSZ6I"
+        },
+        {
+            "AccountId": "1912023982415938",
+            "DisplayName": "LP-0001-Network",
+            "FolderId": "fd-hOUI3BSZ6I"
+        },
+        {
+            "AccountId": "1104023982264802",
+            "DisplayName": "LP-0002-Security",
+            "FolderId": "fd-hOUI3BSZ6I"
+        }
+    ]
+}
