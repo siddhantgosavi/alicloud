@@ -4,7 +4,7 @@ from aliyunsdkcore.client import AcsClient
 from aliyunsdksas.request.v20181203.DescribeRiskTypeRequest import DescribeRiskTypeRequest
 from aliyunsdksas.request.v20181203.ModifyStrategyRequest import ModifyStrategyRequest
 
-client = AcsClient('LTAI5tBsFinWzfYL6eaEc4E4', 'Ye6r0OC7rYx2KWzD2gEDgbKUASC2J4', 'cn-hangzhou')
+client = AcsClient('xxx', 'xxx', 'cn-hangzhou')
 
 # request = DescribeRiskTypeRequest()
 # request.set_accept_format('json')
